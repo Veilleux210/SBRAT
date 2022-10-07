@@ -50,6 +50,4 @@ This is for educational purposes only. I am not responsible for any damage cause
 
 ## License
 GPLv3 © Veilleux210
-# BIG-RAT
-# SBRAT
 # SBRAT
